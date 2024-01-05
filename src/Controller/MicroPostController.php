@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class MicroPostController extends AbstractController
 {
@@ -25,8 +26,13 @@ class MicroPostController extends AbstractController
     }
 
     #[Route('/add-post', name: 'app_micro_post_add')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function add(Request $request, MicroPostRepository $microPostRepository): Response
     {
+        /*$this->denyAccessUnlessGranted(
+            'IS_AUTHENTICATED_FULLY'
+        );*/
+
         $form = $this->createForm(MicroPostType::class, new MicroPost());
 
         $form->handleRequest($request);
@@ -59,6 +65,7 @@ class MicroPostController extends AbstractController
     }
 
     #[Route('/edit-post/{id}', name: 'app_micro_post_edit')]
+    #[IsGranted('ROLE_EDITOR')]
     public function edit(MicroPost $post, Request $request, MicroPostRepository $microPostRepository): Response
     {
         $form = $this->createForm(MicroPostType::class, $post);
@@ -85,6 +92,7 @@ class MicroPostController extends AbstractController
     }
 
     #[Route('/edit-post/{id}/comment', name: 'app_micro_post_add_comment')]
+    #[IsGranted('ROLE_COMMENTOR')]
     public function addComment(MicroPost $post, Request $request, CommentRepository $commentRepository): Response
     {
         $form = $this->createForm(CommentType::class, new Comment());
@@ -94,6 +102,7 @@ class MicroPostController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $comment = $form->getData();
             $comment->setMicroPost($post);
+            $post->setCreated(new DateTime());
             $comment->setAuthor($this->getUser());
 
             $commentRepository->add($comment, true);
