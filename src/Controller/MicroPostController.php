@@ -8,6 +8,7 @@ use App\Form\CommentType;
 use App\Form\MicroPostType;
 use App\Repository\CommentRepository;
 use App\Repository\MicroPostRepository;
+use App\Security\Voter\MicroPostVoter;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,6 +58,7 @@ class MicroPostController extends AbstractController
     }
 
     #[Route('/show-post/{id}', name: 'app_micro_post_show')]
+    #[IsGranted(MicroPostVoter::VIEW, 'post')]
     public function show(MicroPost $post): Response
     {
         return $this->render('micro_post/show.html.twig', [
@@ -65,7 +67,7 @@ class MicroPostController extends AbstractController
     }
 
     #[Route('/edit-post/{id}', name: 'app_micro_post_edit')]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(MicroPostVoter::EDIT, 'post')]
     public function edit(MicroPost $post, Request $request, MicroPostRepository $microPostRepository): Response
     {
         $form = $this->createForm(MicroPostType::class, $post);
