@@ -54,7 +54,7 @@ class MicroPostController extends AbstractController
         );
     }
 
-    #[Route('/show-post/{id}', name: 'app_micro_post_show')]
+    #[Route('/show-post/{post}', name: 'app_micro_post_show')]
     #[IsGranted(MicroPostVoter::VIEW, 'post')]
     public function show(MicroPost $post): Response
     {
@@ -63,7 +63,7 @@ class MicroPostController extends AbstractController
         ]);
     }
 
-    #[Route('/edit-post/{id}', name: 'app_micro_post_edit')]
+    #[Route('/edit-post/{post}', name: 'app_micro_post_edit')]
     #[IsGranted(MicroPostVoter::EDIT, 'post')]
     public function edit(MicroPost $post, Request $request, MicroPostRepository $microPostRepository): Response
     {
@@ -90,7 +90,7 @@ class MicroPostController extends AbstractController
         );
     }
 
-    #[Route('/edit-post/{id}/comment', name: 'app_micro_post_add_comment')]
+    #[Route('/edit-post/{post}/comment', name: 'app_micro_post_comment')]
     #[IsGranted('ROLE_COMMENTOR')]
     public function addComment(MicroPost $post, Request $request, CommentRepository $commentRepository): Response
     {

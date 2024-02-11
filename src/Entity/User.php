@@ -39,7 +39,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $likedPosts;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: MicroPost::class, orphanRemoval: true)]
-    private Collection $microPosts;
+    private Collection $posts;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comments;
@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->likedPosts = new ArrayCollection();
-        $this->microPosts = new ArrayCollection();
+        $this->posts = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }
 
@@ -178,27 +178,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, MicroPost>
      */
-    public function getMicroPosts(): Collection
+    public function getPosts(): Collection
     {
-        return $this->microPosts;
+        return $this->posts;
     }
 
-    public function addMicroPost(MicroPost $microPost): static
+    public function addMicroPost(MicroPost $post): static
     {
-        if (!$this->microPosts->contains($microPost)) {
-            $this->microPosts->add($microPost);
-            $microPost->setAuthor($this);
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->setAuthor($this);
         }
 
         return $this;
     }
 
-    public function removeMicroPost(MicroPost $microPost): static
+    public function removeMicroPost(MicroPost $post): static
     {
-        if ($this->microPosts->removeElement($microPost)) {
+        if ($this->posts->removeElement($post)) {
             // set the owning side to null (unless already changed)
-            if ($microPost->getAuthor() === $this) {
-                $microPost->setAuthor(null);
+            if ($post->getAuthor() === $this) {
+                $post->setAuthor(null);
             }
         }
 
