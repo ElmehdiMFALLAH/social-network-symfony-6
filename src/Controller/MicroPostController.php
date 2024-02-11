@@ -19,6 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class MicroPostController extends AbstractController
 {
     #[Route('/micro-post', name: 'app_micro_post')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function index(MicroPostRepository $microPostRepository): Response
     {
         return $this->render('micro_post/index.html.twig', [
@@ -27,13 +28,9 @@ class MicroPostController extends AbstractController
     }
 
     #[Route('/add-post', name: 'app_micro_post_add')]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[IsGranted('ROLE_WRITER')]
     public function add(Request $request, MicroPostRepository $microPostRepository): Response
     {
-        /*$this->denyAccessUnlessGranted(
-            'IS_AUTHENTICATED_FULLY'
-        );*/
-
         $form = $this->createForm(MicroPostType::class, new MicroPost());
 
         $form->handleRequest($request);
