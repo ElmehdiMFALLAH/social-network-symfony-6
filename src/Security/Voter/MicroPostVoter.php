@@ -12,6 +12,7 @@ class MicroPostVoter extends Voter
 {
     public const EDIT = 'POST_EDIT';
     public const VIEW = 'POST_VIEW';
+    public const COMMENT = 'POST_COMMENT';
 
     public function __construct(
         private Security $security
@@ -22,8 +23,6 @@ class MicroPostVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        // replace with your own logic
-        // https://symfony.com/doc/current/security/voters.html
         return in_array($attribute, [self::EDIT, self::VIEW])
             && $subject instanceof MicroPost;
     }
@@ -40,14 +39,9 @@ class MicroPostVoter extends Voter
 
         /** @var User $user */
         $user = $token->getUser();
-        // if the user is anonymous, do not grant access
-        /*if (!$user instanceof UserInterface) {
-            return false;
-        }*/
 
         $isAuth = $user instanceof UserInterface;
 
-        // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case self::EDIT:
                 return $isAuth && (
@@ -56,6 +50,11 @@ class MicroPostVoter extends Voter
 
             case self::VIEW:
                 return true;
+                break;
+
+            case self::COMMENT:
+                return $isAuth && (
+                    $subject->getAuthor()->isVerified() === true);
                 break;
         }
 

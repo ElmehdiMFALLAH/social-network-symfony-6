@@ -78,7 +78,7 @@ class MicroPostController extends AbstractController
             $microPostRepository->add($post, true);
 
             $this->addFlash('success', 'Your post has been successfully edited!');
-            return $this->redirectToRoute('app_micro_post_show', ['id' => $post->getId()]);
+            return $this->redirectToRoute('app_micro_post_show', ['post' => $post->getId()]);
         }
 
         return $this->render(
@@ -107,7 +107,7 @@ class MicroPostController extends AbstractController
             $commentRepository->add($comment, true);
 
             $this->addFlash('success', 'Your comment has been successfully added!');
-            return $this->redirectToRoute('app_micro_post_show', ['id' => $post->getId()]);
+            return $this->redirectToRoute('app_micro_post_show', ['post' => $post->getId()]);
         }
 
         return $this->render(
