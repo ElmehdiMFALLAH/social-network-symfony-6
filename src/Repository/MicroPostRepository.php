@@ -7,6 +7,7 @@ use App\Entity\MicroPost;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 
 /**
  * @extends ServiceEntityRepository<MicroPost>
@@ -95,28 +96,25 @@ class MicroPostRepository extends ServiceEntityRepository
         return $query->orderBy('p.created', 'DESC');
     }
 
-    //    /**
-    //     * @return MicroPost[] Returns an array of MicroPost objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findAllWithMinLikes(int $minLikes): array
+    {
+        $idList = $this->findAllQuery(
+            withLikes: true,
+        )->select('p.id')
+            ->groupBy('p.id')
+            ->having('COUNT(l) >= :minLikes')
+            ->setParameter('minLikes', $minLikes)
+            ->getQuery()
+            ->getResult(Query::HYDRATE_SCALAR_COLUMN);
 
-    //    public function findOneBySomeField($value): ?MicroPost
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $this->findAllQuery(
+            withComments: true,
+            withLikes: true,
+            withAuthors: true,
+            withProfiles: true
+        )->where('p.id in (:idList)')
+            ->setParameter('idList', $idList)
+            ->getQuery()
+            ->getResult();
+    }
 }

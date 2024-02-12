@@ -100,7 +100,7 @@ class MicroPostController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $comment = $form->getData();
-            $comment->setMicroPost($post);
+            $comment->setPost($post);
             $post->setCreated(new DateTime());
             $comment->setAuthor($this->getUser());
 
@@ -115,6 +115,28 @@ class MicroPostController extends AbstractController
             [
                 'form' => $form,
                 'post' => $post
+            ]
+        );
+    }
+
+    #[Route('/micro-post/top-liked', name: 'app_micro_post_topliked')]
+    public function topLiked(MicroPostRepository $posts): Response
+    {
+        return $this->render(
+            'micro_post/top_liked.html.twig',
+            [
+                'posts' => $posts->findAllWithMinLikes(5),
+            ]
+        );
+    }
+
+    #[Route('/micro-post/follows', name: 'app_micro_post_follows')]
+    public function follows(MicroPostRepository $posts): Response
+    {
+        return $this->render(
+            'micro_post/follows.html.twig',
+            [
+                'posts' => $posts->findAllWithComments(),
             ]
         );
     }
