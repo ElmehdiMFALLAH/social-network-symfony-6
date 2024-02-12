@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\CommentRepository;
-use Doctrine\DBAL\Types\Types;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CommentRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
@@ -12,24 +12,29 @@ class Comment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'integer')]
+    private $id;
 
     #[ORM\Column(type: 'string', length: 500)]
-    #[Assert\NotBlank]
+    #[Assert\NotBlank()]
     #[Assert\Length(min: 5, max: 500)]
     private $text;
 
-    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\ManyToOne(targetEntity: MicroPost::class, inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?MicroPost $microPost = null;
+    private $post;
 
-    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $author = null;
+    private $author;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $created = null;
+    #[ORM\Column(type: 'datetime')]
+    private $created;
+
+    public function __construct()
+    {
+        $this->created = new DateTime;
+    }
 
     public function getId(): ?int
     {
@@ -41,21 +46,21 @@ class Comment
         return $this->text;
     }
 
-    public function setText(string $text): static
+    public function setText(string $text): self
     {
         $this->text = $text;
 
         return $this;
     }
 
-    public function getMicroPost(): ?MicroPost
+    public function getPost(): ?MicroPost
     {
-        return $this->microPost;
+        return $this->post;
     }
 
-    public function setMicroPost(?MicroPost $microPost): static
+    public function setPost(?MicroPost $post): self
     {
-        $this->microPost = $microPost;
+        $this->post = $post;
 
         return $this;
     }
@@ -65,7 +70,7 @@ class Comment
         return $this->author;
     }
 
-    public function setAuthor(?User $author): static
+    public function setAuthor(?User $author): self
     {
         $this->author = $author;
 
@@ -77,7 +82,7 @@ class Comment
         return $this->created;
     }
 
-    public function setCreated(?\DateTimeInterface $created): static
+    public function setCreated(\DateTimeInterface $created): self
     {
         $this->created = $created;
 
